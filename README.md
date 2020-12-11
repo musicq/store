@@ -1,6 +1,6 @@
 # Store
 
-Store is a state manager library which is built on top of [`RxJS`](https://rxjs-dev.firebaseapp.com/guide/overview). It's inspired by [`redux-observable`](tttps://github.com/redux-observable/redux-observable/), but doesn't depend on redux.
+Store is a state manager library which is built on top of [`RxJS`](https://rxjs-dev.firebaseapp.com/guide/overview). It's inspired by [`redux-observable`](https://github.com/redux-observable/redux-observable/), but doesn't depend on redux.
 
 ## Philosophy
 
