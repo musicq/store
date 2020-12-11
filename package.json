@@ -13,6 +13,10 @@
     "store",
     "rxjs"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry":"https://npm.pkg.github.com/"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/musicq/store.git"
