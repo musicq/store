@@ -9,7 +9,7 @@ function isAction(action: any) {
 export function createEffect<T>(fn: EffectFn<T>) {
   return (
     action$: Subject<Action>,
-    state$: Observable<T>,
+    state$: Observable<T> & { value: T },
     dispatch: DispatchFn
   ) =>
     fn(action$, state$, dispatch).pipe(

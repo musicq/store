@@ -2,7 +2,7 @@ import { Observable, Subject } from 'rxjs'
 
 export type EffectFn<T> = (
   action$: Subject<Action>,
-  state$: Observable<T>,
+  state$: Observable<T> & { value: T },
   dispatch: DispatchFn
 ) => Observable<Action | any>
 

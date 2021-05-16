@@ -7,12 +7,14 @@ import {
   ofType
 } from '../../index'
 
-type TodoState = Array<{ text: string; completed: boolean }>
+type TodoState = Array<{ id: number; text: string; completed: boolean }>
 
 const todoReducer = (state: TodoState = [], action: Action) => {
   switch (action.type) {
     case 'Add':
-      return [...state, { text: action.payload, completed: false }]
+      return [...state, action.payload]
+    case 'Delete':
+      return state.filter((s) => s.id !== action.payload)
     default:
       return state
   }
@@ -38,8 +40,18 @@ store.registerEffects([effect])
 
 store.state$.subscribe((state) => console.log('[State]: \n', state))
 
-store.dispatch({ type: 'Add', payload: 'apple' })
+store.dispatch({
+  type: 'Add',
+  payload: { id: 1, text: 'apple', completed: false },
+})
 
 setTimeout(() => {
-  store.dispatch({ type: 'Add', payload: 'banana' })
+  store.dispatch({
+    type: 'Add',
+    payload: { id: 2, text: 'banana', completed: false },
+  })
 }, 1000)
+
+setTimeout(() => {
+  store.dispatch({ type: 'Delete', payload: 2 })
+}, 3000)
