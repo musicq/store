@@ -1,6 +1,6 @@
 {
   "name": "@musicq/store",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A state manager built on top of RxJS.",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "registry":"https://npm.pkg.github.com/"
+    "registry": "https://npm.pkg.github.com/"
   },
   "repository": {
     "type": "git",
