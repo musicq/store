@@ -1,0 +1,86 @@
+.App {
+  width: 500px;
+  margin: 100px auto;
+}
+
+form {
+  display: flex;
+}
+
+form input {
+  height: 50px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 24px;
+  padding: 0 6px;
+  color: #4c4c4c;
+  vertical-align: middle;
+  flex: 5;
+}
+
+form button[type='submit'] {
+  flex: 1;
+  height: 50px;
+  background: rgb(0, 0, 161);
+  color: #fff;
+  vertical-align: middle;
+  border: 0;
+  border-radius: 8px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+form button[type='submit']:hover {
+  background: blue;
+}
+
+form button[disabled] {
+  cursor: not-allowed;
+  background-color: gray !important;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul li {
+  display: flex;
+  margin-left: 0;
+  padding: 8px;
+  transition: background 0.2s ease-in;
+}
+
+ul li:hover {
+  background: #f1f1f1;
+}
+
+ul label {
+  flex: 1;
+}
+
+ul span {
+  display: inline-block;
+  margin-left: 10px;
+  width: 250px;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  font-size: 18px;
+  word-break: break-word;
+  vertical-align: top;
+}
+
+ul span.completed {
+  text-decoration: line-through;
+  color: gray;
+}
+
+ul i[role='close'] {
+  cursor: pointer;
+  font-style: normal;
+}
+
+ul i[role='close']:hover {
+  color: red;
+}
