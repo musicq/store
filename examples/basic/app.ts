@@ -29,9 +29,7 @@ const store = createStore(reducers)
 const effect = createEffect((action$) =>
   action$.pipe(
     ofType('@@INIT'),
-    tap((s) => {
-      console.log('init event', s)
-    }),
+    tap((s) => console.log('init event', s)),
     mapTo(1)
   )
 )
