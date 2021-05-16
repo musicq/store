@@ -1,46 +1,31 @@
-import {BehaviorSubject, Observable} from 'rxjs'
-import {scan, shareReplay, tap} from 'rxjs/operators'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { scan, shareReplay, tap } from 'rxjs/operators'
+import { Action, EffectFn, Reducer } from './types'
 
-export type Reducer<T> = (state: T, action: Action) => T
+const identify = <T>(x: T) => x
 
-export interface Action {
-  type: string
-  payload?: any
-}
+export function createStore<T>(reducers: Reducer<T> = identify) {
+  const action$ = new BehaviorSubject<Action>({ type: '@@INIT' })
 
-export type EffectFn<T> = (
-  action$: BehaviorSubject<Action>,
-  state$: Observable<T>
-) => Observable<Action | any>
-
-const action$ = new BehaviorSubject<Action>({type: '@@INIT'})
-const stateChannel$ = new BehaviorSubject({} as any)
-
-export function createStore<T>(reducers: Reducer<T>) {
   const state$ = action$.pipe(
     scan((state: T, action: Action) => reducers(state, action), {} as T),
-    shareReplay(1),
-    tap(state => stateChannel$.next(state))
-  )
+    tap((state) => (state$.value = state)),
+    shareReplay(1)
+  ) as Observable<T> & { value: T }
 
   function dispatch(action: Action) {
     action$.next(action)
   }
 
+  function registerEffects(effects: EffectFn<T>[]) {
+    for (const effect of effects) {
+      effect(action$, state$, dispatch).subscribe()
+    }
+  }
+
   return {
     state$,
-    dispatch
+    dispatch,
+    registerEffects,
   }
-}
-
-export function createEffect<T>(fn: EffectFn<T>) {
-  fn(action$, stateChannel$)
-    .pipe(
-      tap(action => {
-        if (action) {
-          action$.next(action)
-        }
-      })
-    )
-    .subscribe()
 }

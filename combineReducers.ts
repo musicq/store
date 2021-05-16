@@ -1,7 +1,7 @@
-import {Action} from './createStore'
+import { Action, Reducer } from './types'
 
 interface Reducers {
-  [key: string]: (state: any, action: Action) => any
+  [key: string]: Reducer<any>
 }
 
 export function combineReducers(reducers: Reducers) {
