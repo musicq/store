@@ -1,6 +1,9 @@
 # Store
 
-Store is a state manager library which is built on top of [`RxJS`](https://rxjs-dev.firebaseapp.com/guide/overview). It's inspired by [`redux-observable`](https://github.com/redux-observable/redux-observable/), but doesn't depend on redux.
+Store is a state manager library which is built on top of
+[`RxJS`](https://rxjs-dev.firebaseapp.com/guide/overview). It's inspired by
+[`redux-observable`](https://github.com/redux-observable/redux-observable/), but
+doesn't depend on redux.
 
 ## Philosophy
 
@@ -34,17 +37,20 @@ yarn add @musciq/store
 
 ## Usage
 
-First of all, we need to create a global store instance using `createStore` function.
+First of all, we need to create a global store instance using `createStore`
+function.
 
 Create a **store.js** file and append the below code.
 
 ```js
-import {createStore} from '@musicq/store'
+import { createStore } from '@musicq/store'
 
 export const store = createStore()
 ```
 
-It will create a store instance. The store instance contains 2 objects, one is `state$`, which is the source of our state, the other is `dispatch` function, it is used to dispatch an action to update our state.
+It will create a store instance. The store instance contains 2 objects, one is
+`state$`, which is the source of our state, the other is `dispatch` function, it
+is used to dispatch an action to update our state.
 
 Next we need to create a reducer to reduce our state.
 
@@ -56,7 +62,7 @@ export function todos(state = [], action) {
     case 'CREATE TODO':
       return [...state, action.payload]
     case 'DELETE TODO':
-      return state.filter(t => t.id !== action.payload)
+      return state.filter((t) => t.id !== action.payload)
     default:
       return state
   }
@@ -66,7 +72,7 @@ export function todos(state = [], action) {
 Then, import todo reducer into `store.js` file
 
 ```js
-import {todos} from './todo'
+import { todos } from './todo'
 ```
 
 Pass todo reducer as a parameter of `createStore`
@@ -80,56 +86,72 @@ Everything is ready, let's play with it!
 Create a `app.js` file.
 
 ```js
-import {store} from 'store'
+import { store } from 'store'
 
-store.state$.subscribe(state => console.log(state))
+store.state$.subscribe((state) => console.log(state))
 
-store.dispatch({type: 'CREATE TODO', payload: {id: 1, content: 'Learn how to use @musicq/store'}})
+store.dispatch({
+  type: 'CREATE TODO',
+  payload: { id: 1, content: 'Learn how to use @musicq/store' },
+})
 
 setTimeout(() => {
-    store.dispatch({type: 'DELETE TODO', payload: 1})
+  store.dispatch({ type: 'DELETE TODO', payload: 1 })
 }, 3000)
 ```
 
-That looks great! However, how could we dispatch an async action? That's super easy in `store`.
+That looks great! However, how could we dispatch an async action? That's super
+easy in `store`.
 
-Let's say we need to tell the server the new todo data via HTTP request, then update the store once the server responses.
+Let's say we need to tell the server the new todo data via HTTP request, then
+update the store once the server responses.
 
-To achieve that goal, let's create an `effects.js` file to manage our effect functions.
+To achieve that goal, let's create an `effects.js` file to manage our effect
+functions.
 
 ```js
-import {createEffect} from '@musicq/store'
-import {switchMap} from 'rxjs/operators'
-import {from} from 'rxjs'
+import { createEffect } from '@musicq/store'
+import { switchMap } from 'rxjs/operators'
+import { from } from 'rxjs'
 
-createEffect((action$, state$) =>
+export const effect = createEffect((action$, state$, dispatch) =>
   action$.pipe(
-    filter(action => action.type === 'SEND NEW TODO TO SERVER'),
-    switchMap(action =>
-      // mock communication with server 
-      from(new Promise(resolve => {
-        setTimeout(() => resolve(action.payload), 1000)
-      }))
+    filter((action) => action.type === 'SEND NEW TODO TO SERVER'),
+    switchMap((action) =>
+      // mock communication with server
+      from(
+        new Promise((resolve) => {
+          setTimeout(() => resolve(action.payload), 1000)
+        })
+      )
     ),
     // Dispatch an action
-    map(res => ({type: 'CREATE TODO', payload: res}))
+    // This equals to `dispatch({type: 'CREATE TODO', payload: res})`
+    map((res) => ({ type: 'CREATE TODO', payload: res }))
   )
 )
 ```
 
-Now, let's import our effects into `store.js` file to let it run.
+Now, let's import our effects into `store.js` file and register it to the store
+to make it work.
 
 ```js
-import './effects.js'
+import { effect } from './effects.js'
+
+store.registerEffects([effect /* you can have multiple effects here */])
 ```
 
 Then let change the dispatch action name in our `app.js` file
 
 ```js
-store.dispatch({type: 'SEND NEW TODO TO SERVER', payload: {id: 1, content: 'Learn how to use @musicq/store'}})
+store.dispatch({
+  type: 'SEND NEW TODO TO SERVER',
+  payload: { id: 1, content: 'Learn how to use @musicq/store' },
+})
 ```
 
-Now when we run the `app.js`, it won't update the store immediately, instead, there will be a 1s delay, and then update the store.
+Now when we run the `app.js`, it won't update the store immediately, instead,
+there will be a 1s delay, and then update the store.
 
 So the flow will be
 
@@ -149,6 +171,7 @@ interface Action {
 ```
 
 ### `Reducer`
+
 ```typescript
 type Reducer<T> = (state: T, action: Action) => T
 ```
@@ -156,9 +179,10 @@ type Reducer<T> = (state: T, action: Action) => T
 ### `EffectFn`
 
 ```typescript
-type EffectFn<T> = (
-  action$: BehaviorSubject<Action>,
-  state$: Observable<T>
+export type EffectFn<T> = (
+  action$: Subject<Action>,
+  state$: Observable<T> & { value: T },
+  dispatch: DispatchFn
 ) => Observable<Action | any>
 ```
 
@@ -169,13 +193,23 @@ type EffectFn<T> = (
 To create a store instance
 
 ```typescript
-type createStore = <T>(reducers: Reducer<T>) => {state$: Observable<T>, dispatch: (action: Action) => void}
+type createStore = <T>(reducers?: Reducer<T>) => {
+  state$: Observable<T> & { value: T }
+  dispatch: (action: Action) => void
+  registerEffects: (effects: EffectFn<T>[]) => void
+}
 ```
 
 ### `createEffect`
 
 ```typescript
-type createEffect = <T>(fn: EffectFn<T>) => void
+type createEffect = <T>(
+  fn: EffectFn<T>
+) => (
+  action$: Subject<Action>,
+  state$: Observable<T> & { value: T },
+  dispatch: DispatchFn
+) => Observable<any>
 ```
 
 ### `combineReducers`
@@ -183,10 +217,13 @@ type createEffect = <T>(fn: EffectFn<T>) => void
 Combine multiple reducers
 
 ```typescript
-type combineReducers = (reducers: {[key: string]: Reducer<any>}) => Reducer<any>
+type combineReducers = (reducers: {
+  [key: string]: Reducer<any>
+}) => Reducer<any>
 ```
 
-For example, if you have a `todo` reducer and a `user` reducer. You can combine them up and pass it to the `createStore`.
+For example, if you have a `todo` reducer and a `user` reducer. You can combine
+them up and pass it to the `createStore`.
 
 ```typescript
 function todos(state = [], action) {
@@ -209,9 +246,8 @@ function users(state = [], action) {
 
 const reducers = combineReducers({
   todos,
-  users
+  users,
 })
 
 const store = createStore(reducers)
 ```
-
