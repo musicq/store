@@ -1,2 +1,6 @@
 export * from './createStore'
 export * from './combineReducers'
+export * from './createEffects'
+export * from './types'
+export { ofType } from './operators/ofType'
+export { select } from './operators/select'
