@@ -1,13 +1,11 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "es5",
     "module": "ESNext",
     "declaration": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./",
-    "tsBuildInfoFile": "./",
+    "rootDir": "./src",
     "removeComments": true,
     "importHelpers": true,
     "strict": true,
@@ -19,5 +17,6 @@
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "lib": ["ESNext"]
-  }
+  },
+  "include": ["src"]
 }

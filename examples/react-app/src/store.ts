@@ -5,7 +5,7 @@ import {
   createEffect,
   createStore,
   ofType
-} from '../../../index'
+} from '../../../src'
 
 export type TodoState = Array<{ id: string; text: string; completed: boolean }>
 

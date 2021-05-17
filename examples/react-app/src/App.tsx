@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react'
-import { select } from '../../../operators/select'
+import { select } from '../../../src'
 import './App.css'
 import { store, TodoState } from './store'
 
